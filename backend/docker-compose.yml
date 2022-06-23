@@ -1,0 +1,25 @@
+version: '3.8'
+
+
+services:
+  fast_api:
+    container_name: fast_api
+    restart: always
+    build:
+      context: ./fast_api
+    environment:
+      DEBUG: '${DEBUG:-false}'
+      ALLOWED_HOSTS: '${ALLOWED_HOSTS:-}'
+      HTTP_BASIC_USERNAME: '${HTTP_BASIC_USERNAME:-}'
+      HTTP_BASIC_PASSWORD: '${HTTP_BASIC_PASSWORD:-}'
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_EMAIL: ${WEBMASTER_EMAIL}
+      VIRTUAL_PORT: "8000" # UI exposed from this port
+    expose:
+      - "8000"
+
+
+networks:
+  auto-reverse-proxy-global-network:
+    external: true
