@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from requests import HTTPError
 from fast_api import settings
 from fast_api.routers.hello import router as test_router
+from fast_api.routers.fsharp import router as fsharp_router
 import secrets
 from fastapi import status, HTTPException, Depends
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
@@ -48,6 +49,7 @@ def get_current_user(username: str = Depends(authorize)):
 
 
 # Add routers
+app.include_router(fsharp_router, prefix="/api", dependencies=[Depends(authorize)])
 if settings.DEBUG:  # only in debug mode
     app.include_router(test_router, prefix="/api", dependencies=[Depends(authorize)])
 
