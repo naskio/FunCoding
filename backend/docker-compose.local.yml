@@ -1,0 +1,30 @@
+version: '3.8'
+
+
+services:
+  selenium-chrome:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium-chrome
+    restart: always
+    shm_size: 2gb
+    expose:
+      - 4444
+
+  fast_api:
+    container_name: fast_api
+    restart: always
+    build:
+      context: ./fast_api
+    environment:
+      DEBUG: '${DEBUG:-true}'
+      ALLOWED_HOSTS: '${ALLOWED_HOSTS:-}'
+      HTTP_BASIC_USERNAME: '${HTTP_BASIC_USERNAME:-}'
+      HTTP_BASIC_PASSWORD: '${HTTP_BASIC_PASSWORD:-}'
+    ports:
+      - "${FAST_API_PORT:-8000}:8000"
+
+
+networks:
+  default:
+    external: true
+    name: l_shared-network
