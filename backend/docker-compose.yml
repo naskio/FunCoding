@@ -18,6 +18,8 @@ services:
       VIRTUAL_PORT: "8000" # UI exposed from this port
     expose:
       - "8000"
+    networks:
+      - auto-reverse-proxy-global-network
 
 
 networks:
