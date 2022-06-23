@@ -33,8 +33,11 @@ app = FastAPI()
 @app.exception_handler(HTTPError)
 async def requests_exception_handler(request: Request, exc: HTTPError):
     return JSONResponse(
-        status_code=exc.response.status_code,
-        content=exc.response.json(),
+        # status_code=exc.response.status_code,
+        status_code=400,
+        content={
+            "message": exc.response.text,
+        },
     )
 
 
