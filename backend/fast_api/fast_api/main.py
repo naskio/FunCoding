@@ -27,8 +27,16 @@ def authorize(credentials: HTTPBasicCredentials = Depends(http_basic)) -> str:
 
 
 app = FastAPI()
-
-
+origins = [
+    "http://localhost:1234"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # custom error handling
 @app.exception_handler(HTTPError)
 async def requests_exception_handler(request: Request, exc: HTTPError):
