@@ -1,7 +1,7 @@
 {
   "main": "src/App.js",
   "scripts": {
-    "start": "parcel src/index.html & lcp --origin http://localhost1234 --proxyUrl https://funcoding.nask.io/api/format",
+    "start": "parcel src/index.html",
     "build": "parcel build src/index.html",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "eslint \"src/**/*.{js,jsx}\" --quiet"
