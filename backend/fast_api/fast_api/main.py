@@ -9,6 +9,7 @@ import secrets
 from fastapi import status, HTTPException, Depends
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 http_basic = HTTPBasic()
 
@@ -27,9 +28,8 @@ def authorize(credentials: HTTPBasicCredentials = Depends(http_basic)) -> str:
 
 
 app = FastAPI()
-origins = [
-    "http://localhost:1234"
-]
+origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -37,6 +37,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 # custom error handling
 @app.exception_handler(HTTPError)
 async def requests_exception_handler(request: Request, exc: HTTPError):
