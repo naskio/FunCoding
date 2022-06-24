@@ -1,7 +1,7 @@
 {
   "main": "src/App.js",
   "scripts": {
-    "start": "parcel src/index.html",
+    "start": "parcel src/index.html & lcp --origin http://localhost1234 --proxyUrl https://funcoding.nask.io/api/format",
     "build": "parcel build src/index.html",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "eslint \"src/**/*.{js,jsx}\" --quiet"
@@ -10,6 +10,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@monaco-editor/react": "^4.4.5",
+    "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.8.5",
     "@tailwindcss/forms": "^0.5.2",
     "ace-builds": "^1.6.0",

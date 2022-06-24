@@ -1,31 +1,29 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import CodingArea from "./components/coding-area";
+import MainWrapper from "./components/main-wrapper";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import "normalize.css";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
+//import my logo from resources
+import logo from "./assets/logo.png";
+
 const darkTheme = createTheme({
   //todo make a switch to change between dark and light
   palette: {
     mode: "dark",
   },
 });
-
+//add logo to <img>
 const App = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <center>
-        <h1>cool logo here</h1>
+        <img src={logo} width="150px" alt="Page logo" />
       </center>
-      <Box
-        sx={{
-          width: "100%",
-          backgroundColor: "red",
-        }}
-      >
-        <CodingArea />
+      <Box>
+        <MainWrapper />
       </Box>
     </ThemeProvider>
   );
