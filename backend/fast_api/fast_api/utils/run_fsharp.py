@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
+import json
 
 TO_BE_REPLACED = "Microsoft (R) F# Compiler version 10.2.3 for F# 4.5\nCopyright (c) Microsoft Corporation. All Rights Reserved.\n"
 
@@ -28,23 +29,24 @@ module Main =
 
 def run_code() -> tuple[bool, str]:
     # browser = webdriver.Remote("http://selenium-chrome:4444/wd/hub", DesiredCapabilities.CHROME)
+    # browser = webdriver.Remote("http://localhost:4444/wd/hub", DesiredCapabilities.CHROME)
     # browser = webdriver.Chrome()
-    browser = webdriver.Chrome(ChromeDriverManager().install())
+    capabilities = DesiredCapabilities.CHROME
+    capabilities["loggingPrefs"] = {"performance": "ALL"}  # newer: goog:loggingPrefs
+    browser = webdriver.Chrome(ChromeDriverManager().install(), desired_capabilities=capabilities)
     # step 1: opening the browser
-    browser.get('https://onecompiler.com/fsharp')
-    # WebDriverWait(browser, 20).until(ex_cond.element_to_be_clickable((By.ID, 'code'))).click()
-    # time.sleep(1)
+    browser.get('https://www.jdoodle.com/compile-fsharp-online/')
+    WebDriverWait(browser, 20).until(ex_cond.element_to_be_clickable((By.ID, 'code'))).click()
     print(browser.title, '->', browser.current_url)
     code_area = browser.find_element(By.ID, 'code')
     stdin_area = browser.find_element(By.NAME, 'stdin')
     execute_button = browser.find_element(By.XPATH, "//*[@data-icon='play']")
     # step 2: clearing the code area
     pyperclip.copy(EXAMPLE)
-
     actions = ActionChains(browser)
-    actions.send_keys_to_element(code_area, Keys.CONTROL + "a")
-    actions.send_keys_to_element(code_area, Keys.CONTROL + "v")
-    actions.perform()
+    # actions.send_keys_to_element(code_area, Keys.CONTROL + "a")
+    # actions.send_keys_to_element(code_area, Keys.CONTROL + "v")
+    # actions.perform()
     # for i in range(0, 5):
     #     actions.send_keys_to_element(code_area, Keys.BACKSPACE)
     # actions.perform()
@@ -67,8 +69,8 @@ def run_code() -> tuple[bool, str]:
     #     actions.perform()
     # step 4: writing the input
     # actions = ActionChains(browser)
-    actions.send_keys_to_element(stdin_area, 'Mehdi')
-    actions.perform()
+    # actions.send_keys_to_element(stdin_area, 'Mehdi')
+    # actions.perform()
     # step 5: executing the code
     # actions = ActionChains(browser)
     actions.click(execute_button)
@@ -105,9 +107,14 @@ def run_code() -> tuple[bool, str]:
     # step 5
     # browser.implicitly_wait(10)
     # step 6
-    # WebDriverWait(browser, 10).until(
-    #     ex_cond.presence_of_element_located((By.ID, 'output'))
-    # )
+    execute_time_div = WebDriverWait(browser, 60).until(
+        ex_cond.visibility_of_element_located((By.CLASS_NAME, 'execute-time'))
+    )  # sometimes it timeout here
+    execute_time_span = execute_time_div.find_element(By.TAG_NAME, 'span')
+    execute_time = execute_time_span.text
+    print('results', '->', execute_time)
+    output_area = browser.find_element(By.ID, 'output')
+    print(output_area.text)
 
     # if 'erreur' in browser.title:
     #     return False, f'Page error: "{browser.title}"'
@@ -144,6 +151,24 @@ def run_code() -> tuple[bool, str]:
     #     return False, "input(id='dayValueId') is disabled"
     # browser.quit()
     time.sleep(10)
+    # extract requests from logs
+    logs_raw = browser.get_log("performance")
+    logs = [json.loads(lr["message"])["message"] for lr in logs_raw]
+
+    def log_filter(log_):
+        return (
+            # is an actual response
+                log_["method"] == "Network.responseReceived"
+                # and json
+                and "json" in log_["params"]["response"]["mimeType"]
+        )
+
+    for log in filter(log_filter, logs):
+        request_id = log["params"]["requestId"]
+        resp_url = log["params"]["response"]["url"]
+        print(f"Caught {resp_url}")
+        print(browser.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id}))
+
     return True, "RDV available !"
 
 
